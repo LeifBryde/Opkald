@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Telefonliste</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: #000;
+    color: #ffff00;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 15px;
+}
+
+.container {
+    max-width: 430px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    font-size: 42px;
+    margin-bottom: 25px;
+}
+
+.top-buttons {
+    margin-bottom: 20px;
+}
+
+.record {
+    border: 3px solid #ffff00;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.record h2 {
+    font-size: 34px;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.feltlinje {
+    margin-bottom: 18px;
+}
+
+label {
+    display: block;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+    min-height: 70px;
+    font-size: 40px;
+    font-weight: bold;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 3px solid #ffff00;
+    background: #222;
+    color: #ffff00;
+    letter-spacing: 3px;
+}
+
+input:focus {
+    outline: 5px solid white;
+    outline-offset: 2px;
+}
+
+button {
+    width: 100%;
+    min-height: 64px;
+    font-size: 28px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+button:focus {
+    outline: 5px solid white;
+}
+
+.btn-gem {
+    background: #0a7a0a;
+    color: white;
+}
+
+.btn-laes {
+    background: #004dcc;
+    color: white;
+}
+
+.btn-ring {
+    background: #ffcc00;
+    color: black;
+}
+
+#status {
+    text-align: center;
+    font-size: 28px;
+    margin-top: 20px;
+}
+
+::placeholder {
+    color: #cccc00;
+    opacity: 1;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Telefonliste</h1>
+
+<div class="top-buttons">
+<button
+type="button"
+class="btn-gem"
+onclick="gemListe()">
+Gem listen
+</button>
+</div>
+
+<div id="liste"></div>
+
+<div id="status"></div>
+
+</div>
+
+<script>
+
+const liste = document.getElementById("liste");
+
+for(let i = 1; i <= 10; i++) {
+
+liste.innerHTML += `
+<div class="record">
+
+<h2>Person ${i}</h2>
+
+<div class="feltlinje">
+<label for="navn${i}">
+Navn
+</label>
+
+<input
+id="navn${i}"
+type="text"
+maxlength="50">
+</div>
+
+<div class="feltlinje">
+<label for="telefon${i}">
+Telefonnummer
+</label>
+
+<input
+id="telefon${i}"
+type="tel"
+inputmode="numeric"
+maxlength="11"
+placeholder="22 22 22 22"
+oninput="formatTelefon(this)">
+</div>
+
+<button
+type="button"
+class="btn-laes"
+onclick="laesPost(${i})">
+Læs denne post op
+</button>
+
+<button
+type="button"
+class="btn-ring"
+onclick="ringOp(${i})">
+Ring op
+</button>
+
+</div>
+`;
+}
+
+function formatTelefon(input) {
+
+let tal = input.value.replace(/\D/g, '');
+
+tal = tal.substring(0, 8);
+
+let blokke = tal.match(/.{1,2}/g);
+
+input.value =
+blokke ? blokke.join(" ") : "";
+}
+
+function laesPost(nr) {
+
+const navn =
+document.getElementById("navn" + nr).value;
+
+const telefon =
+document.getElementById("telefon" + nr).value;
+
+let tekst = "";
+
+if (navn) {
+    tekst += "Navn. " + navn + ". ";
+}
+
+if (telefon) {
+
+    tekst +=
+    "Telefonnummer. " +
+    telefon.replaceAll(" ", ", ") +
+    ".";
+}
+
+if (tekst === "") {
+    tekst = "Denne post er tom.";
+}
+
+speechSynthesis.cancel();
+
+const tale =
+new SpeechSynthesisUtterance(tekst);
+
+tale.lang = "da-DK";
+
+speechSynthesis.speak(tale);
+}
+
+function ringOp(nr) {
+
+const telefon =
+document.getElementById("telefon" + nr).value;
+
+const rentNummer =
+telefon.replace(/\D/g,'');
+
+if (rentNummer.length === 8) {
+
+    window.location.href =
+    "tel:" + rentNummer;
+
+} else {
+
+    alert(
+    "Telefonnummeret skal bestå af 8 cifre."
+    );
+}
+}
+
+function gemListe() {
+
+const data = [];
+
+for(let i = 1; i <= 10; i++) {
+
+    data.push({
+        navn:
+        document.getElementById("navn" + i).value,
+
+        telefon:
+        document.getElementById("telefon" + i).value
+    });
+}
+
+localStorage.setItem(
+"telefonliste",
+JSON.stringify(data)
+);
+
+document.getElementById("status").innerText =
+"Listen er gemt på enheden.";
+}
+
+function hentListe() {
+
+const data =
+JSON.parse(
+localStorage.getItem("telefonliste")
+);
+
+if (!data) {
+    return;
+}
+
+data.forEach((person, index) => {
+
+    const nr = index + 1;
+
+    document.getElementById("navn" + nr).value =
+    person.navn || "";
+
+    document.getElementById("telefon" + nr).value =
+    person.telefon || "";
+});
+}
+
+hentListe();
+
+</script>
+
+</body>
+</html>
