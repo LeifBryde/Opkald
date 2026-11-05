@@ -15,32 +15,35 @@
 body {
     margin: 0;
     padding: 15px;
-    background-color: #000000;
+    background-color: #000;
     color: #ffff00;
     font-family: Arial, Helvetica, sans-serif;
 }
 
 .container {
-    max-width: 430px;
+    width: 100%;
+    max-width: 500px;
     margin: auto;
+    padding-bottom: 30px;
 }
 
 h1 {
     text-align: center;
-    font-size: 42px;
-    margin-bottom: 25px;
+    font-size: 36px;
+    margin: 10px 0 20px 0;
 }
 
 .record {
     border: 3px solid #ffff00;
     border-radius: 14px;
-    padding: 16px;
-    margin-bottom: 20px;
+    padding: 14px;
+    margin-bottom: 15px;
 }
 
 .record h2 {
     margin-top: 0;
-    font-size: 34px;
+    font-size: 30px;
+    margin-bottom: 15px;
 }
 
 .feltlinje {
@@ -49,20 +52,20 @@ h1 {
 
 label {
     display: block;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: bold;
     margin-bottom: 8px;
 }
 
 input {
     width: 100%;
-    min-height: 70px;
+    min-height: 64px;
     padding: 10px 14px;
-    font-size: 40px;
+    font-size: 32px;
     font-weight: bold;
     border-radius: 10px;
     border: 3px solid #ffff00;
-    background-color: #222222;
+    background-color: #222;
     color: #ffff00;
     letter-spacing: 2px;
 }
@@ -77,18 +80,28 @@ button {
     min-height: 64px;
     border: none;
     border-radius: 10px;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: bold;
     margin-top: 10px;
     cursor: pointer;
 }
 
 button:focus {
-    outline: 5px solid #ffffff;
+    outline: 5px solid white;
 }
 
 .btn-gem {
     background-color: #0a7a0a;
+    color: white;
+}
+
+.btn-eksport {
+    background-color: #7a2fd0;
+    color: white;
+}
+
+.btn-import {
+    background-color: #006666;
     color: white;
 }
 
@@ -102,10 +115,19 @@ button:focus {
     color: black;
 }
 
+.bottom-buttons {
+    position: sticky;
+    bottom: 0;
+    background: #000;
+    padding-top: 10px;
+    padding-bottom: env(safe-area-inset-bottom);
+    border-top: 2px solid #444;
+}
+
 #status {
-    margin-top: 20px;
     text-align: center;
-    font-size: 28px;
+    font-size: 24px;
+    margin-top: 15px;
     font-weight: bold;
 }
 
@@ -118,6 +140,10 @@ button:focus {
 
 <h1>Telefonliste</h1>
 
+<div id="liste"></div>
+
+<div class="bottom-buttons">
+
 <button
 type="button"
 class="btn-gem"
@@ -125,9 +151,30 @@ onclick="gemListe()">
 Gem listen
 </button>
 
-<div id="liste"></div>
+<button
+type="button"
+class="btn-eksport"
+onclick="eksporterListe()">
+Eksporter liste
+</button>
+
+<button
+type="button"
+class="btn-import"
+onclick="document.getElementById('importFil').click()">
+Importer liste
+</button>
+
+<input
+type="file"
+id="importFil"
+accept=".json"
+style="display:none"
+onchange="importerListe(event)">
 
 <div id="status"></div>
+
+</div>
 
 </div>
 
@@ -174,22 +221,17 @@ for(let i = 1; i <= 10; i++) {
             type="button"
             class="btn-laes"
             onclick="laesPost(${i})">
-
             Læs denne post op
-
         </button>
 
         <button
             type="button"
             class="btn-ring"
             onclick="ringOp(${i})">
-
             Ring op
-
         </button>
 
-    </div>
-    `;
+    </div>`;
 }
 
 function formatTelefon(input) {
@@ -219,7 +261,6 @@ function laesPost(nr) {
     }
 
     if(telefon) {
-
         tekst +=
             "Telefonnummer. " +
             telefon.replaceAll(" ", ", ") +
@@ -268,13 +309,11 @@ function gemListe() {
     for(let i = 1; i <= 10; i++) {
 
         data.push({
-
             navn:
                 document.getElementById("navn" + i).value,
 
             telefon:
                 document.getElementById("telefon" + i).value
-
         });
     }
 
@@ -283,9 +322,7 @@ function gemListe() {
         JSON.stringify(data)
     );
 
-    document.getElementById(
-        "status"
-    ).innerText =
+    document.getElementById("status").innerText =
         "Listen er gemt på enheden.";
 }
 
@@ -306,6 +343,8 @@ function hentListe() {
 
         const nr = index + 1;
 
+        if(nr > 10) return;
+
         document.getElementById(
             "navn" + nr
         ).value =
@@ -316,6 +355,93 @@ function hentListe() {
         ).value =
             person.telefon || "";
     });
+}
+
+function eksporterListe() {
+
+    const data = [];
+
+    for(let i = 1; i <= 10; i++) {
+
+        data.push({
+            navn:
+                document.getElementById("navn" + i).value,
+
+            telefon:
+                document.getElementById("telefon" + i).value
+        });
+    }
+
+    const json =
+        JSON.stringify(data, null, 2);
+
+    const blob =
+        new Blob(
+            [json],
+            { type: "application/json" }
+        );
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const a =
+        document.createElement("a");
+
+    a.href = url;
+    a.download = "telefonliste.json";
+    a.click();
+
+    URL.revokeObjectURL(url);
+}
+
+function importerListe(event) {
+
+    const fil =
+        event.target.files[0];
+
+    if(!fil) return;
+
+    const reader =
+        new FileReader();
+
+    reader.onload = function(e) {
+
+        try {
+
+            const data =
+                JSON.parse(e.target.result);
+
+            data.forEach((person,index) => {
+
+                const nr = index + 1;
+
+                if(nr > 10) return;
+
+                document.getElementById(
+                    "navn" + nr
+                ).value =
+                    person.navn || "";
+
+                document.getElementById(
+                    "telefon" + nr
+                ).value =
+                    person.telefon || "";
+            });
+
+            gemListe();
+
+            document.getElementById("status").innerText =
+                "Listen er importeret.";
+
+        } catch {
+
+            alert(
+                "Filen kunne ikke læses."
+            );
+        }
+    };
+
+    reader.readAsText(fil);
 }
 
 hentListe();
