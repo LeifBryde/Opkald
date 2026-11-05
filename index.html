@@ -2,22 +2,21 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Telefonliste</title>
 
 <style>
-
 * {
     box-sizing: border-box;
 }
 
 body {
-    background: #000;
-    color: #ffff00;
-    font-family: Arial, Helvetica, sans-serif;
     margin: 0;
     padding: 15px;
+    background-color: #000000;
+    color: #ffff00;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .container {
@@ -31,10 +30,6 @@ h1 {
     margin-bottom: 25px;
 }
 
-.top-buttons {
-    margin-bottom: 20px;
-}
-
 .record {
     border: 3px solid #ffff00;
     border-radius: 14px;
@@ -43,9 +38,8 @@ h1 {
 }
 
 .record h2 {
-    font-size: 34px;
     margin-top: 0;
-    margin-bottom: 16px;
+    font-size: 34px;
 }
 
 .feltlinje {
@@ -62,62 +56,62 @@ label {
 input {
     width: 100%;
     min-height: 70px;
+    padding: 10px 14px;
     font-size: 40px;
     font-weight: bold;
-    padding: 10px 14px;
     border-radius: 10px;
     border: 3px solid #ffff00;
-    background: #222;
+    background-color: #222222;
     color: #ffff00;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
 }
 
 input:focus {
-    outline: 5px solid white;
+    outline: 5px solid #ffffff;
     outline-offset: 2px;
 }
 
 button {
     width: 100%;
     min-height: 64px;
-    font-size: 28px;
-    font-weight: bold;
     border: none;
     border-radius: 10px;
+    font-size: 28px;
+    font-weight: bold;
     margin-top: 10px;
     cursor: pointer;
 }
 
 button:focus {
-    outline: 5px solid white;
+    outline: 5px solid #ffffff;
 }
 
 .btn-gem {
-    background: #0a7a0a;
+    background-color: #0a7a0a;
     color: white;
 }
 
 .btn-laes {
-    background: #004dcc;
+    background-color: #004dcc;
     color: white;
 }
 
 .btn-ring {
-    background: #ffcc00;
+    background-color: #ffcc00;
     color: black;
 }
 
 #status {
+    margin-top: 20px;
     text-align: center;
     font-size: 28px;
-    margin-top: 20px;
+    font-weight: bold;
 }
 
 ::placeholder {
     color: #cccc00;
     opacity: 1;
 }
-
 </style>
 </head>
 
@@ -127,14 +121,12 @@ button:focus {
 
 <h1>Telefonliste</h1>
 
-<div class="top-buttons">
 <button
 type="button"
 class="btn-gem"
 onclick="gemListe()">
 Gem listen
 </button>
-</div>
 
 <div id="liste"></div>
 
@@ -146,170 +138,235 @@ Gem listen
 
 const liste = document.getElementById("liste");
 
+/* Opret 10 personer */
+
 for(let i = 1; i <= 10; i++) {
 
-liste.innerHTML += `
-<div class="record">
+    liste.innerHTML += `
+    <div class="record">
 
-<h2>Person ${i}</h2>
+        <h2>Person ${i}</h2>
 
-<div class="feltlinje">
-<label for="navn${i}">
-Navn
-</label>
+        <div class="feltlinje">
 
-<input
-id="navn${i}"
-type="text"
-maxlength="50">
-</div>
+            <label for="navn${i}">
+                Navn
+            </label>
 
-<div class="feltlinje">
-<label for="telefon${i}">
-Telefonnummer
-</label>
+            <input
+                id="navn${i}"
+                type="text"
+                maxlength="50">
 
-<input
-id="telefon${i}"
-type="tel"
-inputmode="numeric"
-maxlength="11"
-placeholder="22 22 22 22"
-oninput="formatTelefon(this)">
-</div>
+        </div>
 
-<button
-type="button"
-class="btn-laes"
-onclick="laesPost(${i})">
-Læs denne post op
-</button>
+        <div class="feltlinje">
 
-<button
-type="button"
-class="btn-ring"
-onclick="ringOp(${i})">
-Ring op
-</button>
+            <label for="telefon${i}">
+                Telefonnummer
+            </label>
 
-</div>
-`;
+            <input
+                id="telefon${i}"
+                type="tel"
+                inputmode="numeric"
+                maxlength="11"
+                placeholder="22 22 22 22"
+                oninput="formatTelefon(this)">
+
+        </div>
+
+        <button
+            type="button"
+            class="btn-laes"
+            onclick="laesPost(${i})">
+
+            Læs denne post op
+
+        </button>
+
+        <button
+            type="button"
+            class="btn-ring"
+            onclick="ringOp(${i})">
+
+            Ring op
+
+        </button>
+
+    </div>
+    `;
 }
+
+
+/* Formater telefonnummer */
 
 function formatTelefon(input) {
 
-let tal = input.value.replace(/\D/g, '');
+    let tal = input.value.replace(/\D/g,'');
 
-tal = tal.substring(0, 8);
+    tal = tal.substring(0,8);
 
-let blokke = tal.match(/.{1,2}/g);
+    const grupper =
+        tal.match(/.{1,2}/g);
 
-input.value =
-blokke ? blokke.join(" ") : "";
+    input.value =
+        grupper ? grupper.join(" ") : "";
 }
+
+
+/* Læs en person op */
 
 function laesPost(nr) {
 
-const navn =
-document.getElementById("navn" + nr).value;
+    const navn =
+        document.getElementById(
+            "navn" + nr
+        ).value;
 
-const telefon =
-document.getElementById("telefon" + nr).value;
+    const telefon =
+        document.getElementById(
+            "telefon" + nr
+        ).value;
 
-let tekst = "";
+    let tekst = "";
 
-if (navn) {
-    tekst += "Navn. " + navn + ". ";
+    if(navn) {
+
+        tekst +=
+            "Navn. " +
+            navn +
+            ". ";
+    }
+
+    if(telefon) {
+
+        tekst +=
+            "Telefonnummer. " +
+            telefon.replaceAll(
+                " ",
+                ", "
+            ) +
+            ".";
+    }
+
+    if(tekst === "") {
+
+        tekst =
+            "Denne post er tom.";
+    }
+
+    speechSynthesis.cancel();
+
+    const tale =
+        new SpeechSynthesisUtterance(
+            tekst
+        );
+
+    tale.lang = "da-DK";
+
+    speechSynthesis.speak(
+        tale
+    );
 }
 
-if (telefon) {
 
-    tekst +=
-    "Telefonnummer. " +
-    telefon.replaceAll(" ", ", ") +
-    ".";
-}
-
-if (tekst === "") {
-    tekst = "Denne post er tom.";
-}
-
-speechSynthesis.cancel();
-
-const tale =
-new SpeechSynthesisUtterance(tekst);
-
-tale.lang = "da-DK";
-
-speechSynthesis.speak(tale);
-}
+/* Ring op */
 
 function ringOp(nr) {
 
-const telefon =
-document.getElementById("telefon" + nr).value;
+    const telefon =
+        document.getElementById(
+            "telefon" + nr
+        ).value;
 
-const rentNummer =
-telefon.replace(/\D/g,'');
+    const rentNummer =
+        telefon.replace(
+            /\D/g,
+            ""
+        );
 
-if (rentNummer.length === 8) {
+    if(rentNummer.length === 8) {
 
-    window.location.href =
-    "tel:" + rentNummer;
+        window.location.href =
+            "tel:" +
+            rentNummer;
 
-} else {
+    } else {
 
-    alert(
-    "Telefonnummeret skal bestå af 8 cifre."
-    );
+        alert(
+            "Telefonnummeret skal bestå af 8 cifre."
+        );
+    }
 }
-}
+
+
+/* Gem liste */
 
 function gemListe() {
 
-const data = [];
+    const data = [];
 
-for(let i = 1; i <= 10; i++) {
+    for(let i = 1; i <= 10; i++) {
 
-    data.push({
-        navn:
-        document.getElementById("navn" + i).value,
+        data.push({
 
-        telefon:
-        document.getElementById("telefon" + i).value
-    });
+            navn:
+                document.getElementById(
+                    "navn" + i
+                ).value,
+
+            telefon:
+                document.getElementById(
+                    "telefon" + i
+                ).value
+
+        });
+    }
+
+    localStorage.setItem(
+        "telefonliste",
+        JSON.stringify(data)
+    );
+
+    document.getElementById(
+        "status"
+    ).innerText =
+        "Listen er gemt.";
 }
 
-localStorage.setItem(
-"telefonliste",
-JSON.stringify(data)
-);
 
-document.getElementById("status").innerText =
-"Listen er gemt på enheden.";
-}
+/* Hent liste */
 
 function hentListe() {
 
-const data =
-JSON.parse(
-localStorage.getItem("telefonliste")
-);
+    const data =
+        JSON.parse(
+            localStorage.getItem(
+                "telefonliste"
+            )
+        );
 
-if (!data) {
-    return;
-}
+    if(!data) {
+        return;
+    }
 
-data.forEach((person, index) => {
+    data.forEach(
+        (person,index) => {
 
-    const nr = index + 1;
+        const nr =
+            index + 1;
 
-    document.getElementById("navn" + nr).value =
-    person.navn || "";
+        document.getElementById(
+            "navn" + nr
+        ).value =
+            person.navn || "";
 
-    document.getElementById("telefon" + nr).value =
-    person.telefon || "";
-});
+        document.getElementById(
+            "telefon" + nr
+        ).value =
+            person.telefon || "";
+    });
 }
 
 hentListe();
